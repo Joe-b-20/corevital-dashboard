@@ -1,0 +1,39 @@
+{
+  "trace_id": "demo-trace-001",
+  "schema_version": "1.0",
+  "model": {
+    "hf_id": "meta-llama/Llama-2-7b-hf",
+    "architecture": "LlamaForCausalLM",
+    "num_layers": 32,
+    "hidden_size": 4096,
+    "num_attention_heads": 32,
+    "device": "cuda",
+    "dtype": "float16"
+  },
+  "summary": {
+    "generated_tokens": 42,
+    "elapsed_ms": 1250,
+    "total_steps": 42,
+    "prompt_tokens": 15
+  },
+  "prompt": { "text": "What is the capital of France?", "num_tokens": 15 },
+  "generated": { "output_text": "The capital of France is Paris." },
+  "health_flags": {
+    "nan_detected": false,
+    "inf_detected": false,
+    "attention_collapse_detected": false
+  },
+  "extensions": {
+    "risk": { "risk_score": 0.12, "risk_factors": [] },
+    "early_warning": { "failure_risk": 0.05, "warning_signals": [] }
+  },
+  "timeline": [
+    { "step_index": 0, "token": { "token_text": "The" }, "logits_summary": { "entropy": 2.1, "perplexity": 8.2, "surprisal": 2.1, "top_k_margin": 0.5 } },
+    { "step_index": 1, "token": { "token_text": " capital" }, "logits_summary": { "entropy": 1.9, "perplexity": 6.7, "surprisal": 1.9, "top_k_margin": 0.6 } },
+    { "step_index": 2, "token": { "token_text": " of" }, "logits_summary": { "entropy": 1.5, "perplexity": 4.5, "surprisal": 1.5, "top_k_margin": 0.8 } },
+    { "step_index": 3, "token": { "token_text": " France" }, "logits_summary": { "entropy": 1.2, "perplexity": 3.3, "surprisal": 1.2, "top_k_margin": 1.0 } },
+    { "step_index": 4, "token": { "token_text": " is" }, "logits_summary": { "entropy": 1.0, "perplexity": 2.7, "surprisal": 1.0, "top_k_margin": 1.2 } },
+    { "step_index": 5, "token": { "token_text": " Paris" }, "logits_summary": { "entropy": 0.8, "perplexity": 2.2, "surprisal": 0.8, "top_k_margin": 1.5 } },
+    { "step_index": 6, "token": { "token_text": "." }, "logits_summary": { "entropy": 0.6, "perplexity": 1.8, "surprisal": 0.6, "top_k_margin": 1.8 } }
+  ]
+}

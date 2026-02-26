@@ -1,0 +1,5 @@
+{
+  "traces": [
+    { "id": "trace_1", "file": "trace_1.json", "label": "Sample trace — LLM health report" }
+  ]
+}
