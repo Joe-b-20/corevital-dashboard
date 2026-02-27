@@ -87,11 +87,10 @@ This app is ready for static hosting on **AWS Amplify**. After pushing to GitHub
 
 1. In [AWS Amplify Console](https://console.aws.amazon.com/amplify/), choose **New app** → **Host web app**.
 2. Connect your GitHub (or Git provider) and select this repository and branch.
-3. Amplify will detect the build spec from the repo:
-   - **Build spec**: Uses `amplify.yml` in the repo root (`npm ci` → `npm run build`, artifacts from `dist/`).
-   - **SPA redirects**: `public/redirects.json` is copied to `dist/` during build so all routes serve `index.html` for client-side routing.
-4. If your Amplify app does not pick up redirects from the build output, add a single rewrite rule in the Console: **Hosting** → **Rewrites and redirects** → add rule: source `/<*>`, target `/index.html`, type **200 (rewrite)**.
-5. Save and deploy. The app will be available at the Amplify URL.
+3. Amplify will use the build spec from the repo (`amplify.yml`):
+   - **Build**: `npm ci` → `npm run build`, artifacts from `dist/`.
+   - **SPA routing**: The `customRules` block in `amplify.yml` rewrites all path-like requests to `/index.html` (status 200) so React Router can handle them. Requests for real files (e.g. `.json`, `.css`, `.js`) are left unchanged.
+4. Save and deploy. The app will be available at the Amplify URL.
 
 No environment variables or backend are required for Demo or Drag-and-Drop modes.
 
@@ -111,7 +110,7 @@ See [docs/STACK.md](docs/STACK.md) for design notes (JSON tree, ECharts, etc.).
 
 - [x] `public/demo/index.json` lists all trace files in `public/demo/*.json`.
 - [x] `amplify.yml` defines build (e.g. `npm ci` → `npm run build`) and artifacts from `dist/`.
-- [x] `public/redirects.json` is present so the SPA rewrite is applied when deployed (e.g. Amplify).
+- [x] `amplify.yml` includes a `customRules` SPA rewrite so path-based URLs serve `index.html` (CloudFront/Amplify routing).
 - [x] No placeholder links or org names left in README or docs (CoreVital repo link, license).
 
 After push: connect the repo in AWS Amplify, confirm build settings use `amplify.yml`, then deploy.
