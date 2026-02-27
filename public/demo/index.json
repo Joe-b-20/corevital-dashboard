@@ -1,5 +1,8 @@
 {
   "traces": [
-    { "id": "trace_1", "file": "trace_1.json", "label": "Sample trace — LLM health report" }
+    { "id": "trace_51580e50", "file": "trace_51580e50.json", "label": "google/flan-t5-large" },
+    { "id": "trace_7a2842bc", "file": "trace_7a2842bc.json", "label": "meta-llama/Llama-3.2-3B-Instruct" },
+    { "id": "trace_530442d8", "file": "trace_530442d8.json", "label": "mistralai/Mistral-7B-Instruct-v0.2" },
+    { "id": "trace_95fbe00e", "file": "trace_95fbe00e.json", "label": "meta-llama/Llama-3.1-8B-Instruct" }
   ]
 }

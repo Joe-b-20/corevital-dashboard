@@ -287,7 +287,7 @@ export default function App() {
               placeholder="e.g. /path/to/corevital.db"
             />
             <p style={{ fontSize: "0.8rem", color: "#a6adc8", marginTop: "0.25rem" }}>
-              Use <strong>forward slashes</strong>. Path is where the API runs.
+              Use <strong>forward slashes</strong>. Absolute path (e.g. /home/.../runs/corevital.db) is most reliable.
             </p>
             <label style={{ marginTop: "0.5rem" }}>Filter by model (optional)</label>
             <input

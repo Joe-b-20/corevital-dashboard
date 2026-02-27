@@ -56,7 +56,7 @@ export async function fetchDemoIndex(): Promise<{ traces: { id: string; file: st
   return handleResponse(r, () => r.json());
 }
 
-/** Demo mode: fetch a single trace JSON from public/demo/ (e.g. /demo/trace_1.json) */
+/** Demo mode: fetch a single trace JSON from public/demo/ (e.g. /demo/trace_51580e50.json) */
 export async function fetchDemoTrace(relativePath: string): Promise<unknown> {
   const path = relativePath.startsWith("/") ? relativePath : `/demo/${relativePath}`;
   const r = await fetchWithTimeout(path, { timeoutMs: 60_000 });
