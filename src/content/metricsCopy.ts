@@ -13,15 +13,15 @@ export const METRIC_GUIDE = {
     title: "Health flags (top-level summary)",
     items: [
       "NaN/Inf: Any “not a number” or infinity in the model’s internals → stop and debug (bad inputs, precision, or code).",
-      "Attention collapse: Any layer with at least one collapsed head (entropy over keys < 0.1) or concentration > 0.95 on one token. Common in smaller models; only a problem if generation is clearly broken.",
-      "High entropy steps: How many steps had entropy > 4 (model was very uncertain). A few is normal; many suggests confusion.",
+      "Attention collapse: Three-component detection: (1) collapse rate increasing during generation (trend), (2) mean rate > 70% (catastrophic), (3) anomalous vs calibration baseline. Structural heads not flagged. Severity 0–0.8.",
+      "High entropy steps: Steps with entropy above model-specific threshold (default 4.0; GPT-2: 5.0, LLaMA: 3.5). A few normal; many = confusion.",
       "Repetition loop: Last-layer hidden states became nearly identical over 3+ steps (cosine similarity > 0.9995 by default) → model may be stuck repeating.",
       "Mid-layer anomaly: Unusual values (NaN/Inf or L2 norm explosion in the middle third of layers) → possible numerical or training issue.",
     ],
   },
 
   riskScore:
-    "Risk score (0–1): < 0.3 low; 0.3–0.7 moderate, worth a look; > 0.7 high risk — consider shortening generation or changing prompt. Used by --capture on_risk and should_intervene().",
+    "Composite risk score (0–1) from: boolean flags (NaN/Inf, repetition), continuous metrics (entropy, margin, top-K mass, surprisal), and compound signal severities. < 0.3 low; 0.3–0.7 moderate; > 0.7 high.",
 
   entropy: {
     meaning: "“Shannon entropy of the next-token distribution. Range: 0 to ~16–17 bits for typical LLMs. “How unsure was the model when it picked this token?” < 2 very confident (one dominant token); 2–4 normal (several plausible options); > 4 high uncertainty, possible confusion. Red dashed line at 4.0. Timeline charts show missing values as gaps (not zero). Sudden spikes can mean lost context or weird input.",
@@ -41,10 +41,10 @@ export const METRIC_GUIDE = {
     meaning: "Difference between the top token’s probability and the second-most likely. Small margin = model was close to choosing another token; large margin = confident pick.",
     formula: "Top-K margin = p₁ − p₂ (top minus second probability)",
   },
-  voterAgreement: {
+  topkMass: {
     meaning:
-      "Sum of probabilities of the top-K tokens (default K=10). High value = most probability mass on a small set of candidates (model's top choices point the same direction); low = spread across many tokens (model split between different continuations).",
-    formula: "Voter agreement = Σ p(top-K tokens)",
+      "Sum of probabilities of the top-K tokens (default K=10). High = most mass on a small set of candidates; low = spread across many tokens. Formerly 'voter agreement'.",
+    formula: "Top-K mass = Σ p(top-K tokens)",
   },
 
   attentionHeatmaps:
@@ -67,6 +67,14 @@ export const METRIC_GUIDE = {
     "attention_summary.focused_head_count": {
       what: "Number of heads with concentration above 0.9 (very focused on one position).",
       how: "We count heads where max(attention_weights) > 0.9. Complements collapsed head count.",
+    },
+    "attention_summary.entropy_mean_normalized": {
+      what: "Normalized attention entropy (entropy / log(K)), in [0,1]. Comparable across models with different vocabulary sizes.",
+      how: "entropy_mean / log(K) where K is sequence length. Collapse threshold: < 0.03.",
+    },
+    "attention_summary.collapsed_head_rate": {
+      what: "Fraction of heads collapsed (normalized entropy < 0.03). In [0,1]. Comparable across models with different head counts.",
+      how: "collapsed_head_count / num_heads. A rate of 0 = no collapse; approaching 1 = nearly all heads collapsed.",
     },
   } as Record<string, { what: string; how: string }>,
 
@@ -125,5 +133,11 @@ export const METRIC_GUIDE = {
 
   rag: "This run was executed with retrieval-augmented context. Use this to correlate behavior with context length or source documents.",
   earlyWarning: "Failure risk and signals derived from timeline (entropy trend, repetition, etc.). Use for triage.",
-  riskWhat: "Single risk score (0–1) from health flags. High = NaN/Inf, repetition, mid-layer anomaly, or many high-entropy steps. Blamed layers = layers that had anomalies or attention collapse.",
+  earlyWarningSignals:
+    "Signal names: entropy_accelerating (entropy second derivative positive), margin_collapsed (top-K margin near zero), margin_declining (margin trending down), surprisal_volatile (surprisal standard deviation high), entropy_margin_divergence (entropy rising while margin not falling — unusual). Plus repetition_loop, mid_layer_anomaly, attention_collapse.",
+  riskWhat: "Composite risk score (0–1) from: boolean flags (NaN/Inf, repetition), continuous metrics (entropy, margin, top-K mass, surprisal), and compound signal severities. < 0.3 low; 0.3–0.7 moderate; > 0.7 high. Blamed layers = layers with anomalies, attention collapse, or compound signals.",
+  compoundSignals:
+    "Multi-metric failure patterns. Signals: context_loss (entropy + low margin + attention collapse), confident_confusion (low entropy but high surprisal), degenerating_generation (rising entropy + declining margin), attention_bottleneck (collapse + high surprisal), confident_repetition_risk (low entropy + repetition pattern). Each has severity (0–1) and evidence text.",
+  calibration:
+    "Compares this run against a baseline profile. Divergence score (0–1) measures deviation from baseline behavior. Anomalies list specific deviations. Present only when a calibration profile is configured.",
 };

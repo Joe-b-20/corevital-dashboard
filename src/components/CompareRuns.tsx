@@ -1,4 +1,5 @@
 import type { CoreVitalReport } from "../types/report";
+import { isEnrichedBlamedLayers } from "../types/report";
 
 function extractCompareMetrics(report: CoreVitalReport): Record<string, string | number | boolean | undefined> {
   const model = report.model ?? {};
@@ -8,19 +9,31 @@ function extractCompareMetrics(report: CoreVitalReport): Record<string, string |
   const prompt = report.prompt ?? {};
   const generated = report.generated ?? {};
   const health = report.health_flags ?? {};
-  const risk = (report.extensions ?? {}).risk ?? {};
+  const ext = report.extensions ?? {};
+  const risk = ext.risk ?? {};
   const quant = model.quantization ?? {};
   const quantStr = quant.enabled ? quant.method ?? "enabled" : "None";
   const promptText = (prompt.text ?? "?").slice(0, 80);
   const outputText = (generated.output_text ?? "?").slice(0, 80);
+
+  const blamedDisplay = isEnrichedBlamedLayers(risk.blamed_layers)
+    ? risk.blamed_layers.map((bl) => `L${bl.layer}(${bl.severity.toFixed(2)})`).join(", ")
+    : (risk.blamed_layers_flat ?? risk.blamed_layers as number[] | undefined)?.join(", ");
+
   return {
     "Risk score": risk.risk_score,
+    "Attention collapse severity": health.attention_collapse_severity,
+    "Failure risk": ext.early_warning?.failure_risk,
     "NaN detected": health.nan_detected,
     "Inf detected": health.inf_detected,
     "Attention collapse": health.attention_collapse_detected,
     "High entropy steps": health.high_entropy_steps,
     "Repetition loop": health.repetition_loop_detected,
     "Mid-layer anomaly": health.mid_layer_anomaly_detected,
+    "Fingerprint version": ext.fingerprint?.version,
+    "Compound signals": ext.compound_signals?.length ?? 0,
+    "Divergence score": ext.calibration?.divergence_score,
+    "Blamed layers": blamedDisplay,
     Model: model.hf_id,
     "Num layers": model.num_layers,
     "Hidden size": model.hidden_size,

@@ -29,13 +29,20 @@ export interface CoreVitalReport {
     nan_detected?: boolean;
     inf_detected?: boolean;
     attention_collapse_detected?: boolean;
+    attention_collapse_severity?: number;
     high_entropy_steps?: number;
     repetition_loop_detected?: boolean;
     mid_layer_anomaly_detected?: boolean;
   };
   extensions?: {
-    fingerprint?: { prompt_hash?: string; vector?: number[] };
-    risk?: { risk_score?: number; risk_factors?: string[]; blamed_layers?: number[] };
+    fingerprint?: { prompt_hash?: string; vector?: number[]; version?: number };
+    risk?: {
+      risk_score?: number;
+      risk_factors?: string[];
+      blamed_layers?: BlamedLayer[] | number[];
+      blamed_layers_flat?: number[];
+      attention_collapse_detail?: AttentionCollapseDetail;
+    };
     early_warning?: { failure_risk?: number; warning_signals?: string[] };
     rag?: {
       context_token_count?: number;
@@ -60,6 +67,9 @@ export interface CoreVitalReport {
       corevital_overhead_ms?: number;
       corevital_overhead_pct?: number;
     };
+    compound_signals?: CompoundSignal[];
+    calibration?: CalibrationExtension;
+    metric_consistency?: MetricConsistencyExt;
   };
   timeline?: TimelineStep[];
   prompt_analysis?: {
@@ -88,10 +98,14 @@ export interface TimelineStep {
     entropy?: number;
     perplexity?: number;
     surprisal?: number;
-    /** Dashboard uses this; CoreVital schema also uses top1_top2_margin */
     top_k_margin?: number;
     top1_top2_margin?: number;
+    /** @deprecated Use topk_mass instead */
     voter_agreement?: number;
+    topk_mass?: number;
+    /** @deprecated Use topk_probs instead */
+    topk?: TopKItem[];
+    topk_probs?: TopKItem[];
   };
   layers?: Array<{
     attention_summary?: {
@@ -102,8 +116,15 @@ export interface TimelineStep {
       concentration_min?: number;
       collapsed_head_count?: number;
       focused_head_count?: number;
+      entropy_mean_normalized?: number;
+      collapsed_head_rate?: number;
     };
-    hidden_summary?: { l2_norm_mean?: number };
+    hidden_summary?: {
+      l2_norm_mean?: number;
+      clipped?: boolean;
+      clip_fraction?: number;
+      clip_max_before?: number;
+    };
   }>;
 }
 
@@ -114,4 +135,53 @@ export interface TraceRow {
   schema_version?: string;
   prompt_hash?: string | null;
   risk_score?: number | null;
+}
+
+export interface TopKItem {
+  token_id: number;
+  token_text: string;
+  prob: number;
+}
+
+export interface BlamedLayer {
+  layer: number;
+  reasons: string[];
+  severity: number;
+}
+
+export interface CompoundSignal {
+  name: string;
+  description: string;
+  severity: number;
+  evidence: string | string[];
+}
+
+export interface CalibrationExtension {
+  divergence_score?: number;
+  anomalies?: string[];
+  baseline_model_id?: string;
+  baseline_num_runs?: number;
+}
+
+export interface MetricConsistencyExt {
+  warnings?: string[];
+  count?: number;
+}
+
+export interface AttentionCollapseDetail {
+  mean_collapse_rate?: number;
+  trend_detected?: boolean;
+  trend_peak_deviation?: number;
+  trend_layers?: number[];
+  catastrophic?: boolean;
+  calibration_anomaly?: boolean;
+  calibration_anomaly_layers?: number[];
+  per_layer_mean_collapse_rate?: number[];
+}
+
+export function isEnrichedBlamedLayers(
+  bl: BlamedLayer[] | number[] | undefined
+): bl is BlamedLayer[] {
+  if (!bl || bl.length === 0) return false;
+  return typeof bl[0] === "object" && "layer" in (bl[0] as BlamedLayer);
 }

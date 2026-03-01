@@ -1,8 +1,9 @@
 {
   "traces": [
-    { "id": "trace_51580e50", "file": "trace_51580e50.json", "label": "google/flan-t5-large" },
-    { "id": "trace_7a2842bc", "file": "trace_7a2842bc.json", "label": "meta-llama/Llama-3.2-3B-Instruct" },
-    { "id": "trace_530442d8", "file": "trace_530442d8.json", "label": "mistralai/Mistral-7B-Instruct-v0.2" },
-    { "id": "trace_95fbe00e", "file": "trace_95fbe00e.json", "label": "meta-llama/Llama-3.1-8B-Instruct" }
+    { "id": "trace_8d0bad87", "file": "trace_8d0bad87.json", "label": "google/flan-t5-large" },
+    { "id": "trace_7c1c62d1", "file": "trace_7c1c62d1.json", "label": "meta-llama/Llama-3.2-3B-Instruct" },
+    { "id": "trace_01aeafe3", "file": "trace_01aeafe3.json", "label": "mistralai/Mistral-7B-Instruct-v0.2" },
+    { "id": "trace_f7de7f4d", "file": "trace_f7de7f4d.json", "label": "meta-llama/Llama-3.1-8B-Instruct" },
+    { "id": "trace_1af7ccd1", "file": "trace_1af7ccd1.json", "label": "Qwen/Qwen2-0.5B-Instruct" }
   ]
 }

@@ -6,7 +6,8 @@ A **decoupled, serverless** React Single Page Application (SPA) for [CoreVital](
 
 ## What This Repo Is
 
-- **React dashboard** for viewing CoreVital trace/report JSON: run summaries, health flags, timelines, attention metrics, and raw JSON.
+- **React dashboard** for viewing CoreVital trace/report JSON: run summaries, health flags, timelines, attention metrics, compound signals, calibration, and raw JSON.
+- **Supports CoreVital v0.5.0-rc** schema: enriched blamed layers, compound signals, calibration panel, attention collapse severity with 3-component detail, normalized attention metrics, clip diagnostics, fingerprint v2, and early warning label mapping. Backward compatible with older traces.
 - **Fully independent of the CoreVital Python engine** for normal use: no backend is required for demo or drag-and-drop modes.
 - **Static SPA**: build with Vite and deploy to any static host (e.g. AWS Amplify, S3 + CloudFront, Netlify).
 
